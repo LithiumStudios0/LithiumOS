@@ -1,1 +1,386 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LithiumOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+
+html,body{height:100%;background:#0f0f12;color:#fff}
+body{display:flex;flex-direction:column}
+
+header{width:100%;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;background:#ff2e2e}
+header h1{font-weight:800}
+
+.header-right{display:flex;gap:10px;align-items:center}
+
+.lang.btn{background:#fff;color:#ff2e2e;border:none;padding:14px 28px;border-radius:999px;cursor:pointer;transition:0.2s}
+.btn:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 10px 25px rgba(255,46,46,0.4)}
+.btn:active{transform:scale(0.95)}
+.lang-btn:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 5px 15px rgba(255,46,46,0.4)}
+.lang-btn:active{transform:scale(0.95)}
+
+.btn{background:#fff;color:#ff2e2e;border:none;padding:14px 28px;border-radius:999px;cursor:pointer}
+
+.hero{margin-top:160px;text-align:center;padding:0 20px}
+.hero h2{font-size:42px;font-weight:800;margin-bottom:25px}
+.hero .btn{padding:16px 36px;font-size:16px}
+
+.main{flex:1}
+
+.card{margin:60px auto;background:rgba(255,255,255,0.05);padding:40px;border-radius:25px;width:90%;max-width:1200px}
+
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:25px}
+.feature{background:rgba(255,255,255,0.04);padding:25px;border-radius:18px;text-align:center}
+
+@media(max-width:900px){.features{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.features{grid-template-columns:1fr}}
+
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;opacity:0;pointer-events:none;transition:.25s}
+.modal.active{opacity:1;pointer-events:all}
+
+/* BÜYÜTÜLDÜ */
+.modal-content{
+background:#1a1a1f;
+border-radius:20px;
+width:95%;
+max-width:1100px;
+min-height:600px;
+padding:30px;
+box-shadow:0 20px 60px rgba(0,0,0,.6);
+overflow-y:auto
+}
+
+.menu-btn{
+width:100%;padding:16px;margin-top:15px;
+background:#ff2e2e;border:none;border-radius:12px;
+color:#fff;cursor:pointer;
+transition:0.25s cubic-bezier(.2,.8,.2,1);
+transform:scale(1);
+}
+.menu-btn:hover{
+transform:translateY(-4px) scale(1.04);
+box-shadow:0 15px 35px rgba(255,46,46,0.5);
+}
+.menu-btn:active{
+transform:scale(0.96);
+box-shadow:0 5px 15px rgba(255,46,46,0.3);
+}
+.menu-btn:hover{
+transform:translateY(-3px) scale(1.02);
+box-shadow:0 10px 25px rgba(255,46,46,0.4)
+}
+
+.back-btn{margin-bottom:10px;background:#333;border:none;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer}
+.close-btn{float:right;cursor:pointer}
+
+.view{display:none}
+.view.active{display:block}
+
+.content{line-height:1.7;margin-top:10px}
+
+footer{text-align:center;padding:20px 0;color:#777}
+
+/* FEATURES ANIMATION - FORCE APPLY */
+.features > div{
+  transition: 0.3s cubic-bezier(.2,.8,.2,1) !important;
+  cursor: pointer;
+  transform: translateY(0) scale(1);
+}
+.features > div:hover{
+  transform: translateY(-10px) scale(1.04);
+  box-shadow: 0 20px 40px rgba(255,46,46,0.25);
+}
+.features > div:active{
+  transform: scale(0.96);
+  box-shadow: 0 10px 20px rgba(255,46,46,0.2);
+}
+
+/* ICON ANIMATION */
+.features > div span{
+  display:inline-block;
+  transition:0.3s;
+}
+.features > div:hover span{
+  transform: scale(1.2) rotate(6deg);
+}
+
+</style>
+</head>
+<body>
+
+<header>
+<h1>LithiumOS</h1>
+<div class="header-right">
+<button class="lang-btn" onclick="setLang('tr')">TR</button>
+<button class="lang-btn" onclick="setLang('en')">EN</button>
+<button class="btn" onclick="openDownload()">İndir</button>
+</div>
+</header>
+
+<div class="main">
+<section class="hero">
+<h2 id="title">Yeni Nesil Windows Deneyimi</h2>
+<button class="btn" onclick="openExplore()">Hemen Keşfet</button>
+</section>
+
+<div class="card">
+<h3 id="featuresTitle">Özellikler</h3>
+<div class="features">
+<div class="feature" id="f1">⚡ Yüksek Performans</div>
+<div class="feature" id="f2">🎨 Modern UI</div>
+<div class="feature" id="f3">🔒 Tamamen Güvenilir</div>
+<div class="feature" id="f4">🧩 Modüler Yapı</div>
+<div class="feature" id="f5">📦 Kullanışlı Özellikler</div>
+<div class="feature" id="f6">🧰 Kullanışlı Programlar</div>
+</div>
+</div>
+</div>
+
+<!-- EXPLORE FIXED -->
+<div class="modal" id="exploreModal">
+<div class="modal-content">
+<div class="close-btn" onclick="closeExplore()">✕</div>
+
+<div id="exp1" class="view active">
+<button class="menu-btn" onclick="showExp('exp2')">Lithium11 - Akbaba</button>
+</div>
+
+<div id="exp2" class="view">
+<button class="back-btn" onclick="showExp('exp1')">← Geri</button>
+<button class="menu-btn" onclick="showExp('exp3')">Kaldırılan Bileşenler</button>
+<button class="menu-btn" onclick="showExp('exp4')">Eklenen Özellikler</button>
+<button class="menu-btn" onclick="showExp('exp5')">Uygulanan Tweakler</button>
+</div>
+
+<div id="exp3" class="view">
+<button class="back-btn" onclick="showExp('exp2')">← Geri</button>
+<div class="content">
+→ Kaldırılan Bileşenler;<br><br>
+- Microsoft Edge (WebView ve Internet Explorer Kaldırılmadı)<br>
+- Multimedia Bileşenleri (Eski görüntüleyici duruyor)<br>
+- Network Bileşenleri (Wifi/Ethernet çalışır)<br>
+- Gizlilik Bileşenleri (Telemetri vs.)<br>
+- Sistem Bileşenleri<br>
+- Sistem Uygulamaları<br>
+- Windows Uygulamaları<br><br>
+NOT: Kararlılık için bırakıldı.
+</div>
+</div>
+
+<div id="exp4" class="view">
+<button class="back-btn" onclick="showExp('exp2')">← Geri</button>
+<div class="content">
+→ Eklenen Özellikler ve Programlar;<br><br>
+- LibreWolf Browser<br>
+- LibreOffice<br>
+- 7-Zip<br>
+- EasyContextMenu<br>
+- Nihai Performans Modu<br>
+- Otomatik Kullanıcı Oluşturma<br>
+- Klasik Sağ-Tık Menüsü<br>
+- Görev Çubuğunda Görevi Sonlandır
+</div>
+</div>
+
+<div id="exp5" class="view">
+<button class="back-btn" onclick="showExp('exp2')">← Geri</button>
+<div class="content">
+→ Uygulanan Tweakler;<br><br>
+- TPM / Secure Boot Bypass<br>
+- Compact OS otomatik yönetim<br>
+- Hızlı başlatma kapalı<br>
+- Uzun yollar aktif<br>
+- Gizli bağlantılar temizlendi<br>
+- Windows.old silindi<br>
+- Animasyonlar kapalı<br>
+- Telemetri kapalı<br>
+- Yapışkan tuşlar kapalı
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- DOWNLOAD -->
+<div class="modal" id="downloadModal">
+<div class="modal-content">
+<div class="close-btn" onclick="closeDownload()">✕</div>
+
+<div id="step1" class="view active">
+<button class="menu-btn" onclick="showStep('step2')">Lithium11</button>
+</div>
+
+<div id="step2" class="view">
+<button class="back-btn" onclick="showStep('step1')">← Geri</button>
+<button class="menu-btn" onclick="showStep('step3')">Kod Adı: Akbaba</button>
+</div>
+
+<div id="step3" class="view">
+<button class="back-btn" onclick="showStep('step2')">← Geri</button>
+<button class="menu-btn" onclick="showStep('step4')">Türkçe</button>
+<button class="menu-btn" onclick="showStep('step4')">English</button>
+</div>
+
+<div id="step4" class="view">
+<button class="back-btn" onclick="showStep('step3')">← Geri</button>
+<button class="menu-btn" onclick="goDownload()">x64 İndir</button>
+</div>
+
+</div>
+</div>
+
+<script>
+function openExplore(){document.getElementById('exploreModal').classList.add('active');showExp('exp1')}
+function closeExplore(){document.getElementById('exploreModal').classList.remove('active')}
+function showExp(id){document.querySelectorAll('#exploreModal .view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active')}
+
+function openDownload(){document.getElementById('downloadModal').classList.add('active');showStep('step1')}
+function closeDownload(){document.getElementById('downloadModal').classList.remove('active')}
+function showStep(id){document.querySelectorAll('#downloadModal .view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active')}
+
+function goDownload(){window.location.href='https://mega.nz/file/KOxAFYwT#xEdMnEKfllnGK5MZH2kZ88w1OaT69uMr0oa7qOtvu88?download'}
+
+function setLang(lang){
+  if(lang === 'en'){
+    document.getElementById('title').innerText = 'Next Generation Windows Experience';
+    document.querySelector('.hero .btn').innerText = 'Explore Now';
+    document.querySelector('.header-right .btn').innerText = 'Download';
+
+    document.getElementById('featuresTitle').innerText = 'Features';
+    document.getElementById('f1').innerText = '⚡ High Performance';
+    document.getElementById('f2').innerText = '🎨 Modern UI';
+    document.getElementById('f3').innerText = '🔒 Fully Reliable';
+    document.getElementById('f4').innerText = '🧩 Modular Structure';
+    document.getElementById('f5').innerText = '📦 Useful Features';
+    document.getElementById('f6').innerText = '🧰 Useful Programs';
+
+    document.querySelectorAll('.back-btn').forEach(b => b.innerText = '← Back');
+
+    document.querySelector('#step2 .menu-btn').innerText = 'Code Name: Akbaba';
+    document.querySelectorAll('#step3 .menu-btn')[0].innerText = 'Turkish';
+    document.querySelectorAll('#step3 .menu-btn')[1].innerText = 'English';
+    document.querySelector('#step4 .menu-btn').innerText = 'Download x64';
+
+    document.querySelectorAll('#exp2 .menu-btn')[0].innerText = 'Removed Components';
+    document.querySelectorAll('#exp2 .menu-btn')[1].innerText = 'Added Features';
+    document.querySelectorAll('#exp2 .menu-btn')[2].innerText = 'Applied Tweaks';
+
+  } else {
+    document.getElementById('title').innerText = 'Yeni Nesil Windows Deneyimi';
+    document.querySelector('.hero .btn').innerText = 'Hemen Keşfet';
+    document.querySelector('.header-right .btn').innerText = 'İndir';
+
+    document.getElementById('featuresTitle').innerText = 'Özellikler';
+    document.getElementById('f1').innerText = '⚡ Yüksek Performans';
+    document.getElementById('f2').innerText = '🎨 Modern UI';
+    document.getElementById('f3').innerText = '🔒 Tamamen Güvenilir';
+    document.getElementById('f4').innerText = '🧩 Modüler Yapı';
+    document.getElementById('f5').innerText = '📦 Kullanışlı Özellikler';
+    document.getElementById('f6').innerText = '🧰 Kullanışlı Programlar';
+
+    document.querySelectorAll('.back-btn').forEach(b => b.innerText = '← Geri');
+
+    document.querySelector('#step2 .menu-btn').innerText = 'Kod Adı: Akbaba';
+    document.querySelectorAll('#step3 .menu-btn')[0].innerText = 'Türkçe';
+    document.querySelectorAll('#step3 .menu-btn')[1].innerText = 'English';
+    document.querySelector('#step4 .menu-btn').innerText = 'x64 İndir';
+
+    document.querySelectorAll('#exp2 .menu-btn')[0].innerText = 'Kaldırılan Bileşenler';
+    document.querySelectorAll('#exp2 .menu-btn')[1].innerText = 'Eklenen Özellikler';
+    document.querySelectorAll('#exp2 .menu-btn')[2].innerText = 'Uygulanan Tweakler';
+  }
+}
+// FULL TEXT TRANSLATION
+function translateContent(lang){
+
+if(lang==='en'){
+
+// EXPLORE TEXTS
+ document.querySelector('#exp3 .content').innerHTML = `
+ → Removed Components;<br><br>
+ - Microsoft Edge (WebView and Internet Explorer not removed)<br>
+ - Multimedia Components (Old viewer remains)<br>
+ - Network Components (WiFi/Ethernet works)<br>
+ - Privacy Components (Telemetry etc.)<br>
+ - System Components<br>
+ - System Applications<br>
+ - Windows Applications<br><br>
+ NOTE: Kept for system stability.`;
+
+ document.querySelector('#exp4 .content').innerHTML = `
+ → Added Features and Programs;<br><br>
+ - LibreWolf Browser<br>
+ - LibreOffice<br>
+ - 7-Zip<br>
+ - EasyContextMenu<br>
+ - Ultimate Performance Mode<br>
+ - Automatic User Creation<br>
+ - Classic Right Click Menu<br>
+ - End Task in Taskbar`;
+
+ document.querySelector('#exp5 .content').innerHTML = `
+ → Applied Tweaks;<br><br>
+ - TPM / Secure Boot Bypass<br>
+ - Compact OS auto management<br>
+ - Fast startup disabled<br>
+ - Long paths enabled<br>
+ - Hidden links cleaned<br>
+ - Windows.old removed<br>
+ - Animations disabled<br>
+ - Telemetry disabled<br>
+ - Sticky keys disabled`;
+
+ document.querySelector('footer').innerText = 'LithiumOS, Developed by Lithium Studios. All rights reserved.';
+
+}else{
+
+ document.querySelector('#exp3 .content').innerHTML = `
+ → Kaldırılan Bileşenler;<br><br>
+ - Microsoft Edge (WebView ve Internet Explorer Kaldırılmadı)<br>
+ - Multimedia Bileşenleri (Eski görüntüleyici duruyor)<br>
+ - Network Bileşenleri (Wifi/Ethernet çalışır)<br>
+ - Gizlilik Bileşenleri (Telemetri vs.)<br>
+ - Sistem Bileşenleri<br>
+ - Sistem Uygulamaları<br>
+ - Windows Uygulamaları<br><br>
+ NOT: Kararlılık için bırakıldı.`;
+
+ document.querySelector('#exp4 .content').innerHTML = `
+ → Eklenen Özellikler ve Programlar;<br><br>
+ - LibreWolf Browser<br>
+ - LibreOffice<br>
+ - 7-Zip<br>
+ - EasyContextMenu<br>
+ - Nihai Performans Modu<br>
+ - Otomatik Kullanıcı Oluşturma<br>
+ - Klasik Sağ-Tık Menüsü<br>
+ - Görev Çubuğunda Görevi Sonlandır`;
+
+ document.querySelector('#exp5 .content').innerHTML = `
+ → Uygulanan Tweakler;<br><br>
+ - TPM / Secure Boot Bypass<br>
+ - Compact OS otomatik yönetim<br>
+ - Hızlı başlatma kapalı<br>
+ - Uzun yollar aktif<br>
+ - Gizli bağlantılar temizlendi<br>
+ - Windows.old silindi<br>
+ - Animasyonlar kapalı<br>
+ - Telemetri kapalı<br>
+ - Yapışkan tuşlar kapalı`;
+
+ document.querySelector('footer').innerText = 'LithiumOS, Lithium Studios Tarafından Geliştirildi. Tüm Hakları Saklıdır.';
+}
+}
+
+// CALL BOTH
+const oldSetLang = setLang;
+setLang = function(lang){
+ oldSetLang(lang);
+ translateContent(lang);
+}
+
+</script>
 
